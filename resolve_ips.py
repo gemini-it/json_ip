@@ -9,6 +9,8 @@ import socket
 import json
 import sys
 import argparse
+import subprocess
+import datetime
 from typing import Dict, List, Optional
 
 
@@ -90,6 +92,40 @@ def save_results_to_json(results: Dict[str, List[str]], output_file: str):
         sys.exit(1)
 
 
+def push_to_git(output_file: str, domains_count: int, ips_count: int):
+    """
+    Pousse le fichier JSON vers le repository Git
+    
+    Args:
+        output_file (str): Nom du fichier JSON créé
+        domains_count (int): Nombre de domaines traités
+        ips_count (int): Nombre total d'IPs trouvées
+    """
+    try:
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        commit_message = f"Résultats IP - {timestamp} - {domains_count} domaines, {ips_count} IPs"
+        
+        print(f"\nPush vers Git...")
+        
+        # Ajouter le fichier JSON
+        subprocess.run(['git', 'add', output_file], check=True, capture_output=True)
+        print(f"  → Fichier {output_file} ajouté")
+        
+        # Créer le commit
+        subprocess.run(['git', 'commit', '-m', commit_message], check=True, capture_output=True)
+        print(f"  → Commit créé: {commit_message}")
+        
+        # Pousser vers origin
+        subprocess.run(['git', 'push', 'origin', 'master'], check=True, capture_output=True)
+        print(f"  → Push vers GitHub réussi")
+        
+    except subprocess.CalledProcessError as e:
+        print(f"Erreur Git: {e}")
+        print("Le fichier JSON a été sauvegardé localement mais n'a pas pu être poussé vers Git.")
+    except Exception as e:
+        print(f"Erreur inattendue lors du push Git: {e}")
+
+
 def main():
     """Fonction principale"""
     parser = argparse.ArgumentParser(
@@ -103,6 +139,11 @@ def main():
         '-o', '--output',
         default='ip_results.json',
         help="Fichier de sortie JSON (défaut: ip_results.json)"
+    )
+    parser.add_argument(
+        '--no-git',
+        action='store_true',
+        help="Ne pas pousser le résultat vers Git automatiquement"
     )
     
     args = parser.parse_args()
@@ -138,6 +179,12 @@ def main():
     print(f"Domaines traités: {len(domains)}")
     print(f"Domaines résolus: {domains_with_ips}")
     print(f"Total d'adresses IP: {total_ips}")
+    
+    # Push vers Git si demandé
+    if not args.no_git:
+        push_to_git(args.output, len(domains), total_ips)
+    else:
+        print(f"\nPush Git désactivé (--no-git)")
 
 
 if __name__ == "__main__":

@@ -21,11 +21,14 @@ python resolve_ips.py <fichier_sites.txt> [-o fichier_sortie.json]
 
 ### Exemples
 ```bash
-# Utiliser le fichier d'exemple fourni
+# Utiliser le fichier d'exemple fourni (avec push Git automatique)
 python resolve_ips.py sites_exemple.txt
 
 # Spécifier un fichier de sortie personnalisé
 python resolve_ips.py sites_exemple.txt -o mes_resultats.json
+
+# Désactiver le push Git automatique
+python resolve_ips.py sites_exemple.txt --no-git
 
 # Afficher l'aide
 python resolve_ips.py -h
@@ -64,6 +67,8 @@ Le script génère un fichier JSON avec la structure suivante :
 - ✅ Affichage du progrès en temps réel
 - ✅ Résumé des résultats
 - ✅ Sortie JSON formatée
+- ✅ **Push automatique vers Git** après chaque exécution
+- ✅ Option pour désactiver le push Git (--no-git)
 
 ## Fichiers
 
