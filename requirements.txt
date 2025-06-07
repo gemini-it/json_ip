@@ -1,0 +1,9 @@
+# Ce script utilise uniquement des modules Python standard
+# Aucune dépendance externe n'est requise
+
+# Modules utilisés :
+# - socket (résolution DNS)
+# - json (génération du fichier de sortie)
+# - sys (gestion des arguments système)
+# - argparse (parsing des arguments de ligne de commande)
+# - typing (annotations de type)
