@@ -4,6 +4,6 @@
     "youporn.com",
     "redtube.com",
     "eporner.com",
-    "xhamester.com"
+    "xhamster.com"
   ]
 }
