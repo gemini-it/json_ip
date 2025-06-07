@@ -3,6 +3,7 @@
     "pornhub.com",
     "youporn.com",
     "redtube.com",
-    "eporner.com"
+    "eporner.com",
+    "xhamester.com"
   ]
 }
