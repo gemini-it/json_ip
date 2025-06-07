@@ -113,7 +113,7 @@ def create_ip_list_for_git(results: Dict[str, List[str]]) -> List[str]:
 
 def push_to_git(results: Dict[str, List[str]], domains_count: int, ips_count: int):
     """
-    Pousse le fichier JSON vers le repository Git sous le nom iplist.json
+    Pousse les fichiers JSON et TXT vers le repository Git
     
     Args:
         results (Dict[str, List[str]]): Dictionnaire domaine -> liste d'IPs
@@ -123,21 +123,28 @@ def push_to_git(results: Dict[str, List[str]], domains_count: int, ips_count: in
     try:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         commit_message = f"Résultats IP - {timestamp} - {domains_count} domaines, {ips_count} IPs"
-        git_filename = "iplist.json"
+        git_filename_json = "iplist.json"
+        git_filename_txt = "iplist.txt"
         
         print(f"\nPush vers Git...")
         
         # Créer la liste d'IPs pour Git
         ip_list = create_ip_list_for_git(results)
         
-        # Sauvegarder au format liste pour Git
-        with open(git_filename, 'w', encoding='utf-8') as file:
+        # Sauvegarder au format JSON pour Git
+        with open(git_filename_json, 'w', encoding='utf-8') as file:
             json.dump(ip_list, file, indent=2, ensure_ascii=False)
-        print(f"  → Fichier {git_filename} créé au format liste ({len(ip_list)} IPs uniques)")
+        print(f"  → Fichier {git_filename_json} créé au format liste ({len(ip_list)} IPs uniques)")
         
-        # Ajouter le fichier JSON
-        subprocess.run(['git', 'add', git_filename], check=True, capture_output=True)
-        print(f"  → Fichier {git_filename} ajouté")
+        # Sauvegarder au format TXT pour Git (une IP par ligne)
+        with open(git_filename_txt, 'w', encoding='utf-8') as file:
+            for ip in ip_list:
+                file.write(f"{ip}\n")
+        print(f"  → Fichier {git_filename_txt} créé au format texte ({len(ip_list)} IPs uniques)")
+        
+        # Ajouter les fichiers JSON et TXT
+        subprocess.run(['git', 'add', git_filename_json, git_filename_txt], check=True, capture_output=True)
+        print(f"  → Fichiers {git_filename_json} et {git_filename_txt} ajoutés")
         
         # Créer le commit
         subprocess.run(['git', 'commit', '-m', commit_message], check=True, capture_output=True)
@@ -149,7 +156,7 @@ def push_to_git(results: Dict[str, List[str]], domains_count: int, ips_count: in
         
     except subprocess.CalledProcessError as e:
         print(f"Erreur Git: {e}")
-        print("Le fichier JSON a été sauvegardé localement mais n'a pas pu être poussé vers Git.")
+        print("Les fichiers ont été sauvegardés localement mais n'ont pas pu être poussés vers Git.")
     except Exception as e:
         print(f"Erreur inattendue lors du push Git: {e}")
 

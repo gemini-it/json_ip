@@ -49,13 +49,32 @@ Le script accepte différents formats :
 
 ## Format de sortie
 
-Le script génère un fichier JSON avec la structure suivante :
+Le script génère plusieurs fichiers :
+
+### Fichier de sortie principal (format détaillé)
 ```json
 {
   "google.com": ["142.250.185.78", "2a00:1450:4007:80c::200e"],
   "github.com": ["140.82.121.4"],
   "python.org": ["151.101.193.223", "151.101.1.223"]
 }
+```
+
+### Fichiers automatiquement poussés vers Git
+- **iplist.json** (format OPNsense) :
+```json
+[
+  "142.250.185.78",
+  "140.82.121.4",
+  "151.101.193.223"
+]
+```
+
+- **iplist.txt** (format texte, une IP par ligne) :
+```
+142.250.185.78
+140.82.121.4
+151.101.193.223
 ```
 
 ## Fonctionnalités
@@ -69,6 +88,21 @@ Le script génère un fichier JSON avec la structure suivante :
 - ✅ Sortie JSON formatée
 - ✅ **Push automatique vers Git** après chaque exécution
 - ✅ Option pour désactiver le push Git (--no-git)
+- ✅ **Génération automatique de iplist.json et iplist.txt** pour intégration OPNsense
+
+## Utilisation avec OPNsense
+
+Ce script est conçu pour alimenter automatiquement des alias OPNsense. Après chaque exécution, les fichiers suivants sont disponibles sur GitHub :
+
+### Configuration d'alias OPNsense
+1. **Firewall → Aliases → Add**
+2. **Type** : `URL Table in JSON format (IPs)`
+3. **URL** : `https://raw.githubusercontent.com/gemini-it/json_ip/master/iplist.json`
+4. **Fréquence de rafraîchissement** : selon vos besoins (ex: toutes les heures)
+
+### Alternative format texte
+Pour d'autres usages, le format texte est également disponible :
+- **URL** : `https://raw.githubusercontent.com/gemini-it/json_ip/master/iplist.txt`
 
 ## Fichiers
 
