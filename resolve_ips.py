@@ -92,24 +92,52 @@ def save_results_to_json(results: Dict[str, List[str]], output_file: str):
         sys.exit(1)
 
 
-def push_to_git(output_file: str, domains_count: int, ips_count: int):
+def create_ip_list_for_git(results: Dict[str, List[str]]) -> List[str]:
     """
-    Pousse le fichier JSON vers le repository Git
+    Crée une liste simple d'adresses IP pour le format Git
     
     Args:
-        output_file (str): Nom du fichier JSON créé
+        results (Dict[str, List[str]]): Dictionnaire domaine -> liste d'IPs
+        
+    Returns:
+        List[str]: Liste unique d'adresses IP
+    """
+    ip_set = set()
+    for domain, ips in results.items():
+        for ip in ips:
+            ip_set.add(ip)
+    
+    # Trier les IPs pour un ordre cohérent
+    return sorted(list(ip_set))
+
+
+def push_to_git(results: Dict[str, List[str]], domains_count: int, ips_count: int):
+    """
+    Pousse le fichier JSON vers le repository Git sous le nom iplist.json
+    
+    Args:
+        results (Dict[str, List[str]]): Dictionnaire domaine -> liste d'IPs
         domains_count (int): Nombre de domaines traités
         ips_count (int): Nombre total d'IPs trouvées
     """
     try:
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         commit_message = f"Résultats IP - {timestamp} - {domains_count} domaines, {ips_count} IPs"
+        git_filename = "iplist.json"
         
         print(f"\nPush vers Git...")
         
+        # Créer la liste d'IPs pour Git
+        ip_list = create_ip_list_for_git(results)
+        
+        # Sauvegarder au format liste pour Git
+        with open(git_filename, 'w', encoding='utf-8') as file:
+            json.dump(ip_list, file, indent=2, ensure_ascii=False)
+        print(f"  → Fichier {git_filename} créé au format liste ({len(ip_list)} IPs uniques)")
+        
         # Ajouter le fichier JSON
-        subprocess.run(['git', 'add', output_file], check=True, capture_output=True)
-        print(f"  → Fichier {output_file} ajouté")
+        subprocess.run(['git', 'add', git_filename], check=True, capture_output=True)
+        print(f"  → Fichier {git_filename} ajouté")
         
         # Créer le commit
         subprocess.run(['git', 'commit', '-m', commit_message], check=True, capture_output=True)
@@ -182,7 +210,7 @@ def main():
     
     # Push vers Git si demandé
     if not args.no_git:
-        push_to_git(args.output, len(domains), total_ips)
+        push_to_git(results, len(domains), total_ips)
     else:
         print(f"\nPush Git désactivé (--no-git)")
 

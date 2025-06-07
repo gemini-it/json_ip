@@ -5,7 +5,7 @@ env/
 
 # Fichiers de sortie générés (on garde les JSON pour le versioning)
 # *.json (commenté pour permettre le versioning des résultats)
-!sites_exemple.txt
+sites_exemple.txt
 
 # Fichiers Python
 __pycache__/
